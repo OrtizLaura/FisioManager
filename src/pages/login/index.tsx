@@ -1,85 +1,89 @@
 import React, { useState } from "react";
-import {Text, View, Image, TextInput, Touchable, TouchableOpacity, Alert, ActivityIndicatorComponent, ActivityIndicator} from 'react-native'
+import { Text, View, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
 
 import { styles } from "./style";
-import Logo from '../../assets/logo.png'
-import {MaterialIcons, AntDesign} from '@expo/vector-icons';
+import Logo from "../../assets/logo.png";
+import { MaterialIcons, AntDesign, Octicons } from "@expo/vector-icons";
 import { themes } from "../../global/themes";
 
+import { Input } from "../../components/Input";
+import { Button } from "../../components/Button";
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+
+export default function Login() {
+
+  const navigation = useNavigation<NavigationProp<any>>();
 
 
-export default function Login () {
-    const [email,setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  async function getLogin() {
+    try {
+      setLoading(true);
 
-    async function getLogin() {
-          try {
-            setLoading(true);
+      if (!email || !password) {
+        Alert.alert("Atenção", "Informe os campos obrigatórios");
+        setLoading(false);
+        return;
+      }
 
-            if (!email || !password) {
-            Alert.alert('Atenção', 'Informe os campos obrigatórios');
-            alert('Informe os campos obrigatórios')
-            setLoading(false);
-            return;
-            }
+      navigation.reset({
+        routes: [{name: "BottomRoutes"}]
+       })
 
-            setTimeout(() => {
-            Alert.alert('Logado com sucesso');
-            alert('Logado com sucesso')
-            setLoading(false);
-            }, 3000);
+      setTimeout(() => {
+        Alert.alert("Logado com sucesso");
+        setLoading(false);
+      }, 3000);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-        } catch (error) {
-            console.log(error);
-            setLoading(false); // só cai aqui se der erro
-        }
-        }
+  return (
+    <View style={styles.container}>
+      <View style={styles.boxTop}>
+        <Image source={Logo} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.texto}>Fisio App</Text>
+      </View>
 
+      <View style={styles.boxMid}>
+        <Input
+          value={email}
+          onChangeText={setEmail}
+          title="Endereço de email" 
+          IconRight={MaterialIcons}
+          iconRightName="email"
+        />
+        
+        <Input
+          value={password}
+          onChangeText={setPassword}
+          title="Senha" 
+          IconRight={Octicons}
+          iconRightName={showPassword ? "eye-closed" : "eye"}
+          secureTextEntry={!showPassword}
+          onIconRightPress={() => setShowPassword(!showPassword)}
+        />
+      </View>
 
-
-    return (
-        <View style = {styles.container}>
-            <View style = {styles.boxTop}>
-                <Image source={Logo}
-                style = {styles.logo}
-                resizeMode="contain"/>
-                    <Text style = {styles.texto}>Fisio App</Text>
-                
-            </View>
-
-
-            <View style = {styles.boxMid}>
-                <Text style={styles.titleInput}>Endereço de E-mail</Text>
-                <View style={styles.boxInput}>
-                <TextInput style={styles.input} value={email} onChangeText={(e)=>setEmail(e)}/>
-                <MaterialIcons 
-                    name='email'
-                    size={20}
-                    color={'gray'}/>
-                </View>
-                <Text style={styles.titleInput}>Senha</Text>
-                    <View style={styles.boxInput}>
-               <TextInput style={styles.input} value={password} onChangeText={(text) => setPassword(text)} secureTextEntry={true}/>
-                <MaterialIcons 
-                    name='remove-red-eye'
-                    size={20}
-                    color={'gray'}/>
-                </View>
-
-            </View>
-
-
-            <View style = {styles.boxBotton}>
-                <TouchableOpacity style={styles.botton} onPress={()=>getLogin()}>
-                    {loading?<ActivityIndicator color={'#fff'} size={"small"}/>:< Text style ={styles.textBotton}>Entrar</Text>}
-
-                </TouchableOpacity>
-            <Text style={styles.textButon}>Não possui conta? <Text style ={{color:themes.colors.secundary}}>Crie agora!</Text></Text>
-
-            </View>
-
-        </View>
-    )
+      <View style={styles.boxBotton}>
+        <Button 
+          text="Entrar"
+          loading={loading}
+          onPress={getLogin}  
+        />
+        
+        <Text style={styles.textButton}>
+          Não tem uma conta? 
+          <Text style={styles.textButtonCreate}>Crie agora</Text>
+        </Text>
+      </View>
+    </View>
+  );
 }
