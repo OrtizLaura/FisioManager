@@ -1,5 +1,8 @@
-import { StyleSheet, Dimensions } from "react-native";
+// pages/newAppointment/styles.ts
+import { Dimensions, StyleSheet } from "react-native";
 import { themes } from "../../global/themes";
+
+const { height } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
   container: {
@@ -7,12 +10,12 @@ export const styles = StyleSheet.create({
     backgroundColor: "#b1cebc",
   },
   boxTop: {
-    height: Dimensions.get("window").height / 4,
+    height: height / 4,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#b1cebc",
   },
-   boxMid: {
+  boxMid: {
     flex: 1,
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -43,9 +46,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 14,
   },
-  textArea: {
-    minHeight: 100,
-  },
   pickerWrapper: {
     backgroundColor: "#fff",
     borderRadius: 8,
@@ -53,6 +53,14 @@ export const styles = StyleSheet.create({
   },
   picker: {
     color: "#333",
+  },
+  dateInput: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: "center",
+    minHeight: 40, // Para garantir que o texto fique centralizado verticalmente
   },
   buttonWrapper: {
     marginTop: 28,

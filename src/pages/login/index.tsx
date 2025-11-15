@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Text, View, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
-
 import { styles } from "./style";
 import Logo from "../../assets/logo.png";
 import { MaterialIcons, AntDesign, Octicons } from "@expo/vector-icons";
 import { themes } from "../../global/themes";
-
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import {useNavigation, NavigationProp} from '@react-navigation/native';

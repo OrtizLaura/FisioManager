@@ -1,3 +1,4 @@
+// pages/patient/index.tsx
 import React, { useState } from "react";
 import { View, Text, Alert, Image, TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -6,12 +7,14 @@ import { styles } from "./styles";
 import { Button } from "../../components/Button";
 import { themes } from "../../global/themes";
 import Logo from "../../assets/logo.png";
+import { usePatients, TreatmentType } from "../../context/PatientsContext";
 
 export default function PatientRegister() {
   const navigation = useNavigation<NavigationProp<any>>();
+  const { addPatient } = usePatients();
 
   const [name, setName] = useState("");
-  const [treatment, setTreatment] = useState("");
+  const [treatment, setTreatment] = useState<TreatmentType | "">("");
   const [observation, setObservation] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,23 +26,27 @@ export default function PatientRegister() {
 
     setLoading(true);
 
+    // salva no contexto
+    addPatient({
+      name,
+      treatment: treatment as TreatmentType,
+      observation,
+    });
+
     setTimeout(() => {
       Alert.alert("Sucesso", `Paciente ${name} cadastrado com sucesso!`);
-     
       setLoading(false);
-      navigation.goBack(); // volta para tela anterior
-    }, 1200);
+      navigation.goBack();
+    }, 800);
   }
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.boxTop}>
         <Image source={Logo} style={styles.logo} resizeMode="contain" />
         <Text style={styles.texto}>Cadastro de Pacientes</Text>
       </View>
 
-     
       <View style={styles.boxMid}>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nome do paciente</Text>
@@ -56,7 +63,7 @@ export default function PatientRegister() {
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={treatment}
-              onValueChange={(value) => setTreatment(value)}
+              onValueChange={(value) => setTreatment(value as TreatmentType | "")}
               dropdownIconColor={themes.colors.primary}
               style={styles.picker}
             >
@@ -81,7 +88,11 @@ export default function PatientRegister() {
         </View>
 
         <View style={styles.buttonWrapper}>
-          <Button text="Cadastrar Paciente" loading={loading} onPress={onRegister} />
+          <Button
+            text="Cadastrar Paciente"
+            loading={loading}
+            onPress={onRegister}
+          />
         </View>
       </View>
     </View>

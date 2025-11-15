@@ -1,49 +1,14 @@
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+// pages/list/index.tsx
+import React, { useState, useMemo } from "react";
+import { Text, TouchableOpacity, View, FlatList } from "react-native";
 import { style } from "./styles";
 import { Input } from "../../components/Input";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FlatList } from "react-native-gesture-handler";
 import { Flag } from "../../components/Flag";
 import { themes } from "../../global/themes";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import PatientRegister from "../patient";
+import { usePatients, Patient } from "../../context/PatientsContext";
 
-type PropCard = {
-  item: number;
-  title: string;
-  description: string;
-  flag: "Fisio" | "Pilates";
-};
-
-const data: Array<PropCard> = [
-  {
-    item: 0,
-    title: "Fisioterapia Chloe",
-    description: "Braço e coluna",
-    flag: "Fisio",
-  },
-  {
-    item: 1,
-    title: "Pilates seu Tony",
-    description: "Fortalecimento coluna",
-    flag: "Pilates",
-  },
-  {
-    item: 2,
-    title: "Pilates Cidão",
-    description: "Fortalecimento pélvico",
-    flag: "Pilates",
-  },
-  {
-    item: 3,
-    title: "Fisioterapia Laura",
-    description: "Tratar condocondrite",
-    flag: "Fisio",
-  },
-];
-
-// Deixa a bolinha clicável
 const Ball = ({ color, onPress }: { color: string; onPress?: () => void }) => {
   return (
     <TouchableOpacity
@@ -61,26 +26,56 @@ const Ball = ({ color, onPress }: { color: string; onPress?: () => void }) => {
 
 export default function List() {
   const navigation = useNavigation<NavigationProp<any>>();
+  const { patients, togglePresence } = usePatients();
+
+  const [search, setSearch] = useState("");
 
   const goToPatientRegister = () => {
-    alert(123);
-    navigation.getParent()?.navigate("PatientRegister");
+    navigation.navigate("PatientRegister");
   };
 
-  const renderCard = (item: PropCard) => {
+  function getStatusColor(status: Patient["status"]) {
+    switch (status) {
+      case "present":
+        return "green";
+      case "absent":
+        return "red";
+      default:
+        return "gray";
+    }
+  }
+
+  const filteredPatients = useMemo(() => {
+    const text = search.trim().toLowerCase();
+    if (!text) return patients;
+    return patients.filter(
+      (p) =>
+        p.name.toLowerCase().includes(text) ||
+        (p.observation || "").toLowerCase().includes(text)
+    );
+  }, [patients, search]);
+
+  const renderCard = (item: Patient) => {
+    const isFisio = item.treatment === "fisioterapia";
+
     return (
       <TouchableOpacity style={style.card} activeOpacity={0.8}>
         <View style={style.rowCard}>
           <View style={style.rowCardLeft}>
-            {/* Ao clicar na bolinha, navega */}
-            <Ball color="gray" onPress={goToPatientRegister} />
+            <Ball
+              color={getStatusColor(item.status)}
+              onPress={() => togglePresence(item.id)}
+            />
+
             <View>
-              <Text style={style.titleCard}>{item.title}</Text>
-              <Text style={style.descriptionCard}>{item.description}</Text>
+              <Text style={style.titleCard}>{item.name}</Text>
+              <Text style={style.descriptionCard}>
+                {item.observation || "Sem observações"}
+              </Text>
             </View>
           </View>
 
-          {item.flag === "Fisio" ? (
+          {isFisio ? (
             <Flag caption="Fisio" color={themes.colors.red} />
           ) : (
             <Flag caption="Pilates" color={themes.colors.greenLigth} />
@@ -95,17 +90,40 @@ export default function List() {
       <View style={style.header}>
         <Text style={style.greeting}>Olá Renata!</Text>
         <View style={style.boxInput}>
-          <Input IconLeft={MaterialIcons} IconLeftName="search" />
+          <Input 
+            IconLeft={MaterialIcons}
+            IconLeftName="search"
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Buscar paciente..."
+          />
         </View>
       </View>
 
       <View style={style.boxList}>
         <FlatList
-          data={data}
+          data={filteredPatients}
           style={{ marginTop: 40, paddingHorizontal: 30 }}
-          keyExtractor={(item) => item.item.toString()}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => renderCard(item)}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              {search
+                ? "Nenhum paciente encontrado para essa busca."
+                : "Nenhum paciente cadastrado ainda."}
+            </Text>
+          }
         />
+      </View>
+
+      <View style={style.footer}>
+        <TouchableOpacity
+          style={style.newPatientButton}
+          onPress={goToPatientRegister}
+          activeOpacity={0.8}
+        >
+          <Text style={style.newPatientButtonText}>Novo paciente</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

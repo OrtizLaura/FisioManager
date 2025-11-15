@@ -1,16 +1,20 @@
-import 'react-native-gesture-handler';
-import { StyleSheet, Text, View } from 'react-native';
-import Routes from './src/routes/index.routes';
-import { NavigationContainer } from '@react-navigation/native';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import Routes from "./src/routes";
+import { PatientsProvider } from "./src/context/PatientsContext";
+import { ScheduleProvider } from "./src/context/ScheduleContext";
+import { TherapistScheduleProvider } from "./src/context/TherapistScheduleContext";
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Routes/>
+      <PatientsProvider>
+        <ScheduleProvider>
+          <TherapistScheduleProvider>
+            <Routes />
+          </TherapistScheduleProvider>
+        </ScheduleProvider>
+      </PatientsProvider>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-});

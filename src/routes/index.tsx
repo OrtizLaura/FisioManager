@@ -1,13 +1,13 @@
+// src/routes/index.tsx
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../pages/login";
-import BottomRoutes from "./botton.routes";
 import Register from "../pages/register";
-import PatientRegister from "../pages/patient";
+import AppTabs from "./appTabs"; // ou BottomRoutes, se mantiver o nome
+
+const Stack = createStackNavigator();
 
 export default function Routes() {
-  const Stack = createStackNavigator();
-
   return (
     <Stack.Navigator
       initialRouteName="Login"
@@ -16,12 +16,11 @@ export default function Routes() {
         cardStyle: { backgroundColor: "#b1cebc" },
       }}
     >
+      <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
 
-      <Stack.Screen name="Login" component={Login} />
-
-      <Stack.Screen name="BottomRoutes" component={BottomRoutes} />
-      <Stack.Screen name="PatientRegister" component={PatientRegister} />
+      
+      <Stack.Screen name="BottomRoutes" component={AppTabs} />
     </Stack.Navigator>
   );
 }
