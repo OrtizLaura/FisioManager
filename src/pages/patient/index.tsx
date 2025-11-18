@@ -1,5 +1,4 @@
-// pages/patient/index.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Alert, Image, TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -9,6 +8,12 @@ import { themes } from "../../global/themes";
 import Logo from "../../assets/logo.png";
 import { usePatients, TreatmentType } from "../../context/PatientsContext";
 
+type User = {
+  id: string;
+  fullName: string;
+  email: string;
+};
+
 export default function PatientRegister() {
   const navigation = useNavigation<NavigationProp<any>>();
   const { addPatient } = usePatients();
@@ -17,20 +22,31 @@ export default function PatientRegister() {
   const [treatment, setTreatment] = useState<TreatmentType | "">("");
   const [observation, setObservation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+
+  useEffect(() => {
+    fetch("http://localhost:3000/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch(() =>
+        Alert.alert("Erro", "Não foi possível carregar os usuários.")
+      );
+  }, []);
 
   function onRegister() {
-    if (!name || !treatment) {
+    if (!name || !treatment || !selectedUserId) {
       Alert.alert("Atenção", "Por favor, preencha os campos obrigatórios.");
       return;
     }
 
     setLoading(true);
 
-    // salva no contexto
     addPatient({
       name,
       treatment: treatment as TreatmentType,
       observation,
+      userId: selectedUserId,
     });
 
     setTimeout(() => {
@@ -49,13 +65,24 @@ export default function PatientRegister() {
 
       <View style={styles.boxMid}>
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Nome do paciente</Text>
-          <TextInput
-            placeholder="Digite o nome completo"
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-          />
+          <Text style={styles.label}>Usuário</Text>
+          <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={selectedUserId}
+              onValueChange={(value) => setSelectedUserId(value)}
+              dropdownIconColor={themes.colors.primary}
+              style={styles.picker}
+            >
+              <Picker.Item label="Selecione um usuário" value="" />
+              {users.map((user) => (
+                <Picker.Item
+                  key={user.id}
+                  label={user.fullName}
+                  value={user.id}
+                />
+              ))}
+            </Picker>
+          </View>
         </View>
 
         <View style={styles.formGroup}>
@@ -63,7 +90,9 @@ export default function PatientRegister() {
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={treatment}
-              onValueChange={(value) => setTreatment(value as TreatmentType | "")}
+              onValueChange={(value) =>
+                setTreatment(value as TreatmentType | "")
+              }
               dropdownIconColor={themes.colors.primary}
               style={styles.picker}
             >

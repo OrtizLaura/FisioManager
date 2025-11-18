@@ -29,36 +29,46 @@ export default function Register() {
   }
 
   async function onRegister() {
+    if (!fullName.trim() || !email.trim() || !password || !confirm) {
+      Alert.alert("Atenção", "Preencha todos os campos.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      Alert.alert("Atenção", "Email inválido.");
+      return;
+    }
+
+    if (password !== confirm) {
+      Alert.alert("Atenção", "As senhas não coincidem.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      setLoading(true);
+      const response = await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+        }),
+      });
 
-      if (!fullName || !email || !password || !confirm) {
-        Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
-        return;
-      }
-      if (!isValidEmail(email)) {
-        Alert.alert("Atenção", "Informe um e-mail válido.");
-        return;
-      }
-      if (password.length < 6) {
-        Alert.alert("Atenção", "A senha deve ter pelo menos 6 caracteres.");
-        return;
-      }
-      if (password !== confirm) {
-        Alert.alert("Atenção", "As senhas não coincidem.");
-        return;
-      }
-
-      setTimeout(() => {
+      if (response.ok) {
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
         navigation.reset({
           index: 0,
           routes: [{ name: "BottomRoutes" }],
         });
-      }, 1500);
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Erro", errorData.error || "Erro no cadastro.");
+      }
     } catch (error) {
-      console.log(error);
-      Alert.alert("Erro", "Ocorreu um erro ao realizar o cadastro. Tente novamente.");
+      Alert.alert("Erro", "Erro na comunicação com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +131,6 @@ export default function Register() {
           <Button text="Criar conta" loading={loading} onPress={onRegister} />
         </View>
       </View>
-      
     </View>
   );
 }

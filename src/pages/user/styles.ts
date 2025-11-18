@@ -67,13 +67,18 @@ export const styles = StyleSheet.create({
   userCard: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
     elevation: 2,
+    width: "100%",
   },
 
+  deleteButton: {
+    padding: 8,
+  },
   userIconWrapper: {
     width: 40,
     height: 40,
@@ -123,5 +128,11 @@ export const styles = StyleSheet.create({
     color: "gray",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  userCardWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
 });

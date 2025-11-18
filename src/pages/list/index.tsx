@@ -1,5 +1,11 @@
 import React, { useState, useMemo, useRef } from "react";
-import { Text, TouchableOpacity, View, FlatList, TextInput } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  TextInput,
+} from "react-native";
 import { style } from "./styles";
 import { Input } from "../../components/Input";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -48,9 +54,10 @@ export default function List() {
   const filteredPatients = useMemo(() => {
     const text = search.trim().toLowerCase();
     if (!text) return patients;
-    return patients.filter((p) =>
-      p.name.toLowerCase().includes(text) ||
-      (p.observation || "").toLowerCase().includes(text)
+    return patients.filter(
+      (p) =>
+        p.name.toLowerCase().includes(text) ||
+        (p.observation || "").toLowerCase().includes(text)
     );
   }, [patients, search]);
 
@@ -87,7 +94,7 @@ export default function List() {
   return (
     <View style={style.container}>
       <View style={style.header}>
-        <Text style={style.greeting}>Olá Renata!</Text>
+        <Text style={style.greeting}>Seja bem vinda (o)!</Text>
         <View style={style.boxInput}>
           <Input
             ref={searchInputRef}
@@ -96,9 +103,7 @@ export default function List() {
             value={search}
             onChangeText={setSearch}
             placeholder="Buscar paciente..."
-            // 👉 ação ao clicar na lupa
             onIconLeftPress={() => {
-              // foca o campo e limpa espaços extras
               searchInputRef.current?.focus();
               setSearch((prev) => prev.trim());
             }}
