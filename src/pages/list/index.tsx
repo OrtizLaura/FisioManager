@@ -1,6 +1,5 @@
-// pages/list/index.tsx
-import React, { useState, useMemo } from "react";
-import { Text, TouchableOpacity, View, FlatList } from "react-native";
+import React, { useState, useMemo, useRef } from "react";
+import { Text, TouchableOpacity, View, FlatList, TextInput } from "react-native";
 import { style } from "./styles";
 import { Input } from "../../components/Input";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -29,6 +28,7 @@ export default function List() {
   const { patients, togglePresence } = usePatients();
 
   const [search, setSearch] = useState("");
+  const searchInputRef = useRef<TextInput | null>(null);
 
   const goToPatientRegister = () => {
     navigation.navigate("PatientRegister");
@@ -48,10 +48,9 @@ export default function List() {
   const filteredPatients = useMemo(() => {
     const text = search.trim().toLowerCase();
     if (!text) return patients;
-    return patients.filter(
-      (p) =>
-        p.name.toLowerCase().includes(text) ||
-        (p.observation || "").toLowerCase().includes(text)
+    return patients.filter((p) =>
+      p.name.toLowerCase().includes(text) ||
+      (p.observation || "").toLowerCase().includes(text)
     );
   }, [patients, search]);
 
@@ -90,12 +89,19 @@ export default function List() {
       <View style={style.header}>
         <Text style={style.greeting}>Olá Renata!</Text>
         <View style={style.boxInput}>
-          <Input 
+          <Input
+            ref={searchInputRef}
             IconLeft={MaterialIcons}
             IconLeftName="search"
             value={search}
             onChangeText={setSearch}
             placeholder="Buscar paciente..."
+            // 👉 ação ao clicar na lupa
+            onIconLeftPress={() => {
+              // foca o campo e limpa espaços extras
+              searchInputRef.current?.focus();
+              setSearch((prev) => prev.trim());
+            }}
           />
         </View>
       </View>

@@ -52,9 +52,10 @@ export const Input = forwardRef ((Props:Props, ref: Ref<TextInput> | null) =>{
             )}
             
             <TextInput
-                style={[styles.input, {width: calculateSizeWidth()}]}
+                style={styles.input}
                 ref={ref}
                 {...Props}
+
             />
 
             {IconRight && iconRightName &&(

@@ -24,7 +24,6 @@ export const style = StyleSheet.create({
   boxInput: {
     width: "80%",
   },
-  
 
   boxInputSearch: {
     width: 200,
@@ -43,14 +42,16 @@ export const style = StyleSheet.create({
 
   card: {
     width: "100%",
-    height: 60,
-    backgroundColor: "#fff",
-    marginTop: 6,
-    borderRadius: 10,
-    justifyContent: "center",
-    margin: 10,
-    borderWidth: 2,
-    borderBlockColor: "gray",
+  height: 60,
+  backgroundColor: "#fff",
+  marginTop: 6,
+  borderRadius: 10,
+  justifyContent: "center",
+  margin: 10,
+  borderWidth: 2,
+  borderColor: "gray", 
+  paddingHorizontal: 16,
+  paddingVertical: 10,
   },
 
   ball: {
@@ -78,14 +79,15 @@ export const style = StyleSheet.create({
   },
   newPatientButton: {
     backgroundColor: themes.colors.primary,
-    height: 48,
-    borderRadius: 8,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
   },
   newPatientButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
 });

@@ -5,7 +5,7 @@ import { styles } from "./styles";
 import { AntDesign } from "@expo/vector-icons";
 
 function formatDate(date: Date) {
-  return date.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  return date.toISOString().slice(0, 10);
 }
 
 function getMonthDays(baseDate: Date) {

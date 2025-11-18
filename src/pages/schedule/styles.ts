@@ -98,16 +98,16 @@ export const styles = StyleSheet.create({
   },
 
   newSessionButton: {
-    width: "100%",
+    width: "50%",
     height: 48,
     borderRadius: 24,
-    backgroundColor: themes.colors.secundary,
+    backgroundColor: "#b1cebc",
     alignItems: "center",
     justifyContent: "center",
   },
 
   newSessionButtonText: {
-    color: "#fff",
+    color: "#ffffffff",
     fontWeight: "bold",
     fontSize: 16,
   },
