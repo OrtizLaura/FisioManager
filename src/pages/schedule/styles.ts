@@ -1,5 +1,4 @@
-// pages/schedule/styles.ts
-import { Dimensions, StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { themes } from "../../global/themes";
 
 const { height } = Dimensions.get("window");
@@ -8,107 +7,66 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#b1cebc",
+    paddingHorizontal: 32,
+    paddingTop: 16,
   },
 
-  header: {
-    height: height / 6,
-    backgroundColor: "#b1cebc",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 24,
-  },
-
-  arrowButton: {
-    padding: 8,
-  },
-
-  dateWrapper: {
-    alignItems: "center",
-  },
-
-  dateLabel: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-
-  dateValue: {
-    color: "#fff",
-    fontSize: 16,
-    marginTop: 4,
-  },
-
-  listWrapper: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-  },
-
-  emptyWrapper: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  emptyText: {
+  label: {
     fontSize: 14,
-    color: "#555",
-    textAlign: "center",
+    color: "#fff",
+    marginBottom: 6,
+    fontWeight: "500",
   },
 
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
+  pickerWrapper: {
     backgroundColor: "#fff",
-    borderRadius: 10,
-    marginBottom: 8,
-    elevation: 2,
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 18,
   },
 
-  cardLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+  picker: {
     color: "#333",
   },
 
-  cardSubtitle: {
-    marginTop: 2,
-    fontSize: 14,
-    color: themes.colors.primary,
-  },
-
-  footer: {
-    height: 70,
+  input: {
     backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 18,
+  },
+
+  timeItem: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    paddingBottom: 10,
-  },
-
-  newSessionButton: {
-    width: "50%",
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#b1cebc",
+    marginVertical: 6,
     alignItems: "center",
-    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 
-  newSessionButtonText: {
-    color: "#ffffffff",
+  timeItemSelected: {
+    backgroundColor: themes.colors.primary,
+    borderColor: themes.colors.primary,
+  },
+
+  timeItemText: {
+    fontSize: 14,
+    color: "#333",
+  },
+
+  timeItemTextSelected: {
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
+  },
+
+  buttonWrapper: {
+    marginTop: 28,
+    alignItems: "center",
   },
 });

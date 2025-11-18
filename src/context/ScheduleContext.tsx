@@ -5,15 +5,16 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type SessionStatus = "none" | "present" | "absent";
+
+export type TreatmentType = "FISIOTERAPIA" | "PILATES";
 
 export type Session = {
   id: string;
   patientId: string;
   patientName: string;
-  treatment: "fisioterapia" | "pilates";
+  treatment: "FISIOTERAPIA" | "PILATES";
   date: string;
   time: string;
   status: SessionStatus;
@@ -22,11 +23,9 @@ export type Session = {
 type ScheduleContextData = {
   sessions: Session[];
   getSessionsByDate: (date: string) => Session[];
-  addSession: (data: Omit<Session, "id" | "status">) => void;
-  toggleSessionStatus: (id: string) => void;
+  addSession: (data: Omit<Session, "id" | "status">) => Promise<void>;
+  toggleSessionStatus: (id: string) => Promise<void>;
 };
-
-const STORAGE_KEY = "@fisioapp:sessions";
 
 const ScheduleContext = createContext<ScheduleContextData>(
   {} as ScheduleContextData
@@ -35,43 +34,37 @@ const ScheduleContext = createContext<ScheduleContextData>(
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>([]);
 
+  // Buscar sessões do backend ao montar o componente
   useEffect(() => {
-    (async () => {
-      try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          setSessions(JSON.parse(stored));
-        }
-      } catch (err) {
-        console.log("Erro ao carregar sessões:", err);
-      }
-    })();
+    fetch("http://localhost:3000/sessions")
+      .then((res) => res.json())
+      .then(setSessions)
+      .catch((err) => console.log("Erro ao carregar sessões:", err));
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-      } catch (err) {
-        console.log("Erro ao salvar sessões:", err);
-      }
-    })();
-  }, [sessions]);
 
   function getSessionsByDate(date: string) {
     return sessions.filter((s) => s.date === date);
   }
 
-  function addSession(data: Omit<Session, "id" | "status">) {
-    const newSession: Session = {
-      ...data,
-      id: Date.now().toString(),
-      status: "none",
-    };
-    setSessions((prev) => [...prev, newSession]);
+  async function addSession(data: Omit<Session, "id" | "status">) {
+    try {
+      const res = await fetch("http://localhost:3000/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Erro ao adicionar sessão");
+      const newSessions = await res.json(); // pode ser array se criar múltiplas
+      setSessions((prev) => [...prev, ...newSessions]);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  function toggleSessionStatus(id: string) {
+  async function toggleSessionStatus(id: string) {
+    // Se o backend tiver rota para atualizar status, faça fetch aqui
+    // Caso contrário, atualize localmente (exemplo abaixo)
+
     setSessions((prev) =>
       prev.map((s) => {
         if (s.id !== id) return s;

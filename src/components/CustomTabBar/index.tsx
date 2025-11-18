@@ -1,7 +1,12 @@
 import React, { useContext } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { style } from "./styles";
-import { AntDesign, FontAwesome, MaterialIcons, Feather } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome,
+  MaterialIcons,
+  Feather,
+} from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { AuthContextList } from "../../context/authContext_list";
 
@@ -18,7 +23,6 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <View style={style.tabArea}>
-      
       <TouchableOpacity style={style.tabItem} onPress={() => go("List")}>
         <AntDesign
           name="bars"
@@ -30,7 +34,17 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         />
       </TouchableOpacity>
 
-     
+      <TouchableOpacity style={style.tabItem} onPress={() => go("UsersList")}>
+        <FontAwesome
+          name="user"
+          style={{
+            opacity: state.index === 1 ? 1 : 0.4,
+            fontSize: 28,
+            color: "#fff",
+          }}
+        />
+      </TouchableOpacity>
+
       <TouchableOpacity style={style.tabItem} onPress={() => go("Agenda")}>
         <AntDesign
           name="calendar"
@@ -42,13 +56,10 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         />
       </TouchableOpacity>
 
-
-      <TouchableOpacity style={style.tabCenter} onPress={goToRegister}>
-        <MaterialIcons name="edit" size={40} color="#fff" />
-      </TouchableOpacity>
-
-      
-      <TouchableOpacity style={style.tabItem} onPress={() => go("TherapistCalendar")}>
+      <TouchableOpacity
+        style={style.tabItem}
+        onPress={() => go("TherapistCalendar")}
+      >
         <Feather
           name="calendar"
           style={{
@@ -59,14 +70,16 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         />
       </TouchableOpacity>
 
-      
-      <TouchableOpacity style={style.tabItem} onPress={() => go("UsersList")}>
-        <FontAwesome
-          name="user"
+      <TouchableOpacity
+        style={style.tabItem}
+        onPress={() => go("SessionsList")}
+      >
+        <AntDesign
+          name="group"
           style={{
-            opacity: state.index === 1 ? 1 : 0.4,
-            fontSize: 28,
+            opacity: state.index === 4 ? 1 : 0.4,
             color: "#fff",
+            fontSize: 28,
           }}
         />
       </TouchableOpacity>

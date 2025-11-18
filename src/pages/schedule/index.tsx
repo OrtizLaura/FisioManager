@@ -1,126 +1,195 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { useSchedule, Session } from "../../context/ScheduleContext";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, Alert, Button } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { styles } from "./styles";
 import { themes } from "../../global/themes";
-import { AntDesign } from "@expo/vector-icons";
+import { log } from "console";
 
-type RootStackParamList = {
-  Agenda: undefined;
-  // se você criar uma tela específica de novo agendamento, adiciona aqui
-};
+type User = { id: string; fullName: string };
+type Patient = { id: string; name: string; treatment: string };
+type AvailableDate = { id: string; date: string };
 
-const Ball = ({ color, onPress }: { color: string; onPress?: () => void }) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.7}
-      style={{
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        backgroundColor: color,
-      }}
-    />
-  );
-};
+const availableTimes = [
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+];
 
-export default function AgendaScreen() {
-  const navigation = useNavigation<NavigationProp<any>>();
-  const { getSessionsByDate, toggleSessionStatus } = useSchedule();
+export default function ScheduleSession() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [availableDates, setAvailableDates] = useState<AvailableDate[]>([]);
 
-  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-  const [selectedDate, setSelectedDate] = useState<string>(today);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string>("");
+  const [selectedAvailableDateId, setSelectedAvailableDateId] =
+    useState<string>("");
+  const [selectedTreatment, setSelectedTreatment] = useState("");
+  const [treatment, setTreatment] = useState<string>("");
+  const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const sessions = getSessionsByDate(selectedDate);
+  useEffect(() => {
+    fetch("http://localhost:3000/users")
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch(() => Alert.alert("Erro", "Não foi possível carregar usuários"));
 
-  function getStatusColor(status: Session["status"]) {
-    switch (status) {
-      case "present":
-        return "green";
-      case "absent":
-        return "red";
-      default:
-        return "gray";
+    fetch("http://localhost:3000/patients")
+      .then((res) => res.json())
+      .then(setPatients)
+      .catch(() => Alert.alert("Erro", "Não foi possível carregar pacientes"));
+
+    fetch("http://localhost:3000/available-dates")
+      .then((res) => res.json())
+      .then(setAvailableDates)
+      .catch(() =>
+        Alert.alert("Erro", "Não foi possível carregar datas disponíveis")
+      );
+  }, []);
+
+  function toggleTime(time: string) {
+    if (selectedTimes.includes(time)) {
+      setSelectedTimes(selectedTimes.filter((t) => t !== time));
+    } else {
+      setSelectedTimes([...selectedTimes, time]);
     }
   }
 
-  function changeDate(days: number) {
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + days);
-    const nextDate = current.toISOString().slice(0, 10);
-    setSelectedDate(nextDate);
+  function handlePatientChange(patientId: string) {
+    setSelectedPatientId(patientId);
+    const patient = patients.find((p) => p.id === patientId);
+    console.log(patient);
+    if (patient) {
+      setSelectedTreatment(patient.treatment);
+    } else {
+      setSelectedTreatment("");
+    }
   }
 
-  const renderItem = ({ item }: { item: Session }) => (
-    <View style={styles.card}>
-      <View style={styles.cardLeft}>
-        <Ball
-          color={getStatusColor(item.status)}
-          onPress={() => toggleSessionStatus(item.id)}
-        />
-        <View style={{ marginLeft: 8 }}>
-          <Text style={styles.cardTitle}>{item.patientName}</Text>
-          <Text style={styles.cardSubtitle}>
-            {item.treatment === "fisioterapia" ? "Fisioterapia" : "Pilates"} •{" "}
-            {item.time}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
+  function submit() {
+    if (
+      !selectedUserId ||
+      !selectedPatientId ||
+      !selectedAvailableDateId ||
+      selectedTimes.length === 0
+    ) {
+      Alert.alert(
+        "Erro",
+        "Preencha todos os campos e selecione pelo menos um horário."
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    fetch("http://localhost:3000/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: selectedUserId,
+        patientId: selectedPatientId,
+        treatment: selectedTreatment,
+        availableDateId: selectedAvailableDateId,
+        times: selectedTimes,
+        status: "NONE",
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          Alert.alert("Sucesso", "Sessões agendadas com sucesso!");
+          setSelectedTimes([]);
+          setTreatment("");
+          setSelectedUserId("");
+          setSelectedPatientId("");
+          setSelectedAvailableDateId("");
+        } else {
+          Alert.alert("Erro", "Falha ao agendar sessões.");
+        }
+      })
+      .catch(() => Alert.alert("Erro", "Erro na comunicação com o servidor"))
+      .finally(() => setLoading(false));
+  }
 
   return (
     <View style={styles.container}>
-      {/* Header com data e navegação dia anterior/próximo */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => changeDate(-1)}
-          style={styles.arrowButton}
+      <Text style={styles.label}>Usuário</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={selectedUserId}
+          onValueChange={setSelectedUserId}
+          dropdownIconColor={themes.colors.primary}
+          style={styles.picker}
         >
-          <AntDesign name="left" size={20} color="#fff" />
-        </TouchableOpacity>
-
-        <View style={styles.dateWrapper}>
-          <Text style={styles.dateLabel}>Agenda</Text>
-          <Text style={styles.dateValue}>{selectedDate}</Text>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => changeDate(1)}
-          style={styles.arrowButton}
-        >
-          <AntDesign name="right" size={20} color="#fff" />
-        </TouchableOpacity>
+          <Picker.Item label="Selecione um usuário" value="" />
+          {users.map((u) => (
+            <Picker.Item key={u.id} label={u.fullName} value={u.id} />
+          ))}
+        </Picker>
       </View>
 
-      {/* Lista de sessões */}
-      <View style={styles.listWrapper}>
-        {sessions.length === 0 ? (
-          <View style={styles.emptyWrapper}>
-            <Text style={styles.emptyText}>
-              Nenhum atendimento agendado para esta data.
+      <Text style={styles.label}>Paciente</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={selectedPatientId}
+          onValueChange={handlePatientChange}
+          dropdownIconColor={themes.colors.primary}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione um paciente" value="" />
+          {patients.map((p) => (
+            <Picker.Item key={p.id} label={p.name} value={p.id} />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Data Disponível</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={selectedAvailableDateId}
+          onValueChange={setSelectedAvailableDateId}
+          dropdownIconColor={themes.colors.primary}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecione uma data" value="" />
+          {availableDates.map((d) => (
+            <Picker.Item
+              key={d.id}
+              label={new Date(d.date).toLocaleDateString()}
+              value={d.id}
+            />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Horários</Text>
+      {availableTimes.map((time) => {
+        const selected = selectedTimes.includes(time);
+        return (
+          <TouchableOpacity
+            key={time}
+            onPress={() => toggleTime(time)}
+            style={[styles.timeItem, selected && styles.timeItemSelected]}
+          >
+            <Text
+              style={[
+                styles.timeItemText,
+                selected && styles.timeItemTextSelected,
+              ]}
+            >
+              {time}
             </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={sessions}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingVertical: 12 }}
-          />
-        )}
-      </View>
+          </TouchableOpacity>
+        );
+      })}
 
-      {/* Botão para agendar nova sessão */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.newSessionButton}
-          onPress={() => navigation.navigate("NewAppointment")}
-        >
-          <Text style={styles.newSessionButtonText}>Novo agendamento</Text>
-        </TouchableOpacity>
+      <View style={styles.buttonWrapper}>
+        <Button title="Agendar" onPress={submit} disabled={loading} />
       </View>
     </View>
   );

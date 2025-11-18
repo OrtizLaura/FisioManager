@@ -62,7 +62,7 @@ export default function List() {
   }, [patients, search]);
 
   const renderCard = (item: Patient) => {
-    const isFisio = item.treatment === "fisioterapia";
+    const isFisio = item.treatment === "FISIOTERAPIA";
 
     return (
       <TouchableOpacity style={style.card} activeOpacity={0.8}>

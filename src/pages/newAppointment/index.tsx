@@ -19,7 +19,7 @@ export default function NewAppointmentScreen() {
   const navigation = useNavigation<NavigationProp<any>>();
   const { patients } = usePatients();
   const { addSession } = useSchedule();
-  const { isDateAvailable, getNextAvailableDate } = useTherapistSchedule();
+  const { isDateAvailable } = useTherapistSchedule();
 
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
     null
@@ -31,20 +31,7 @@ export default function NewAppointmentScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const todayIso = toISO(new Date());
-    if (!isDateAvailable(todayIso)) {
-      const next = getNextAvailableDate(todayIso);
-      if (next) {
-        const [year, month, day] = next.split("-").map(Number);
-        setDate(new Date(year!, month! - 1, day!));
-        Alert.alert(
-          "Data ajustada",
-          `Hoje não é um dia de atendimento. A data foi ajustada para ${day}/${month}/${year}.`
-        );
-      }
-    }
-  }, []);
+  useEffect(() => {}, []);
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || date;
@@ -59,6 +46,7 @@ export default function NewAppointmentScreen() {
   };
 
   function handleAddAppointment() {
+    console.log("asdasd");
     if (!selectedPatientId || !treatmentType) {
       Alert.alert(
         "Atenção",
@@ -75,25 +63,6 @@ export default function NewAppointmentScreen() {
 
     const formattedDate = toISO(date);
     const formattedTime = time.toTimeString().slice(0, 5);
-
-    if (!isDateAvailable(formattedDate)) {
-      const next = getNextAvailableDate(formattedDate);
-
-      if (!next) {
-        Alert.alert(
-          "Dia não disponível",
-          "Este dia não está marcado como dia de atendimento, e não encontramos outro dia disponível. Ajuste seu calendário de atendimentos."
-        );
-      } else {
-        const [year, month, day] = next.split("-").map(Number);
-        Alert.alert(
-          "Dia não disponível",
-          `Este dia não está marcado como dia de atendimento.\n\nPróximo dia disponível: ${day}/${month}/${year}.`
-        );
-      }
-
-      return;
-    }
 
     setLoading(true);
 

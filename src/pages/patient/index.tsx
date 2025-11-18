@@ -85,8 +85,8 @@ export default function PatientRegister() {
               style={styles.picker}
             >
               <Picker.Item label="Selecione" value="" />
-              <Picker.Item label="Fisioterapia" value="fisioterapia" />
-              <Picker.Item label="Pilates" value="pilates" />
+              <Picker.Item label="Fisioterapia" value="FISIOTERAPIA" />
+              <Picker.Item label="Pilates" value="PILATES" />
             </Picker>
           </View>
         </View>

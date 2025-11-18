@@ -1,84 +1,67 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect} from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-type TherapistScheduleContextData = {
+type TherapistScheduleContextType = {
   availableDates: string[];
-  toggleDateAvailability: (date: string) => void;
+  toggleDateAvailability: (date: string) => Promise<void>;
   isDateAvailable: (date: string) => boolean;
-  getNextAvailableDate: (fromDate?: string) => string | null;
 };
 
-const STORAGE_KEY = "@fisioapp:therapist_schedule";
+const TherapistScheduleContext = createContext<TherapistScheduleContextType>({
+  availableDates: [],
+  toggleDateAvailability: async () => {},
+  isDateAvailable: () => false,
+});
 
-const TherapistScheduleContext = createContext<TherapistScheduleContextData>(
-  {} as TherapistScheduleContextData
-);
-
-export function TherapistScheduleProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export const TherapistScheduleProvider: React.FC = ({ children }) => {
   const [availableDates, setAvailableDates] = useState<string[]>([]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          setAvailableDates(JSON.parse(stored));
-        }
-      } catch (err) {
-        console.log("Erro ao carregar agenda do fisio:", err);
-      }
-    })();
+    fetch("http://localhost:3000/available-dates")
+      .then((res) => res.json())
+      .then((dates) => {
+        const activeDates = dates
+          .filter((d: any) => d.isActive)
+          .map((d: any) => d.date.slice(0, 10));
+        setAvailableDates(activeDates);
+      });
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(availableDates));
-      } catch (err) {
-        console.log("Erro ao salvar agenda do fisio:", err);
+  const isDateAvailable = (date: string) => availableDates.includes(date);
+
+  const toggleDateAvailability = async (date: string) => {
+    try {
+      if (isDateAvailable(date)) {
+        const res = await fetch(
+          `http://localhost:3000/available-dates/deactivate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date }),
+          }
+        );
+        if (!res.ok) throw new Error("Falha ao desativar data");
+        setAvailableDates((prev) => prev.filter((d) => d !== date));
+      } else {
+        const res = await fetch("http://localhost:3000/available-dates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date }),
+        });
+        if (!res.ok) throw new Error("Falha ao ativar data");
+        setAvailableDates((prev) => [...prev, date]);
       }
-    })();
-  }, [availableDates]);
-
-  function toggleDateAvailability(date: string) {
-    setAvailableDates((prev) => {
-      if (prev.includes(date)) {
-        return prev.filter((d) => d !== date);
-      }
-      return [...prev, date];
-    });
-  }
-
-  function isDateAvailable(date: string) {
-    return availableDates.includes(date);
-  }
-
-  function getNextAvailableDate(fromDate?: string): string | null {
-    if (availableDates.length === 0) return null;
-    const sorted = [...availableDates].sort();
-    if (!fromDate) return sorted[0];
-    const next = sorted.find((d) => d >= fromDate);
-    return next || null;
-  }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <TherapistScheduleContext.Provider
-      value={{
-        availableDates,
-        toggleDateAvailability,
-        isDateAvailable,
-        getNextAvailableDate,
-      }}
+      value={{ availableDates, toggleDateAvailability, isDateAvailable }}
     >
       {children}
     </TherapistScheduleContext.Provider>
   );
-}
+};
 
-export function useTherapistSchedule() {
-  return useContext(TherapistScheduleContext);
-}
+export const useTherapistSchedule = () => useContext(TherapistScheduleContext);
