@@ -35,7 +35,7 @@ export default function PatientRegister() {
   }, []);
 
   function onRegister() {
-    if (!name || !treatment || !selectedUserId) {
+    if (!name || !treatment) {
       Alert.alert("Atenção", "Por favor, preencha os campos obrigatórios.");
       return;
     }
@@ -46,7 +46,6 @@ export default function PatientRegister() {
       name,
       treatment: treatment as TreatmentType,
       observation,
-      userId: selectedUserId,
     });
 
     setTimeout(() => {
@@ -65,24 +64,13 @@ export default function PatientRegister() {
 
       <View style={styles.boxMid}>
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Usuário</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={selectedUserId}
-              onValueChange={(value) => setSelectedUserId(value)}
-              dropdownIconColor={themes.colors.primary}
-              style={styles.picker}
-            >
-              <Picker.Item label="Selecione um usuário" value="" />
-              {users.map((user) => (
-                <Picker.Item
-                  key={user.id}
-                  label={user.fullName}
-                  value={user.id}
-                />
-              ))}
-            </Picker>
-          </View>
+          <Text style={styles.label}>Paciente</Text>
+          <TextInput
+            placeholder="Digite o nome do paciente"
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+          />
         </View>
 
         <View style={styles.formGroup}>
