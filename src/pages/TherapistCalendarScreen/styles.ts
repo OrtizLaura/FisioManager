@@ -15,17 +15,21 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: themes.colors.primary,
   },
+
   arrowButton: {
     padding: 8,
   },
+
   monthTitle: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
+
   daysList: {
     padding: 16,
   },
+
   dayCard: {
     flex: 1,
     margin: 6,
@@ -35,21 +39,25 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   dayCardAvailable: {
     backgroundColor: "#d1f5d3",
     borderWidth: 1,
     borderColor: themes.colors.primary,
   },
+
   dayNumber: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
+
   dayLabel: {
     marginTop: 4,
     fontSize: 12,
     color: "#555",
   },
+
   footer: {
     paddingHorizontal: 24,
     paddingVertical: 12,
@@ -57,14 +65,17 @@ export const styles = StyleSheet.create({
     borderTopColor: "#ccc",
     backgroundColor: "#f7f7f7",
   },
+
   footerTitle: {
     fontWeight: "bold",
     marginBottom: 4,
   },
+  
   footerEmpty: {
     color: "#777",
     fontSize: 13,
   },
+  
   footerDate: {
     fontSize: 13,
     color: "#333",

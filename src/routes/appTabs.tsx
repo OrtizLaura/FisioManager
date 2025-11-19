@@ -1,4 +1,3 @@
-// src/routes/botton.routes.tsx
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import List from "../pages/list";
 import CustomTabBar from "../components/CustomTabBar";

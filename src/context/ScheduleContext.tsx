@@ -34,7 +34,6 @@ const ScheduleContext = createContext<ScheduleContextData>(
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>([]);
 
-  // Buscar sessões do backend ao montar o componente
   useEffect(() => {
     fetch("http://localhost:3000/sessions")
       .then((res) => res.json())
@@ -54,7 +53,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error("Erro ao adicionar sessão");
-      const newSessions = await res.json(); // pode ser array se criar múltiplas
+      const newSessions = await res.json();
       setSessions((prev) => [...prev, ...newSessions]);
     } catch (err) {
       console.log(err);
@@ -62,9 +61,6 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }
 
   async function toggleSessionStatus(id: string) {
-    // Se o backend tiver rota para atualizar status, faça fetch aqui
-    // Caso contrário, atualize localmente (exemplo abaixo)
-
     setSessions((prev) =>
       prev.map((s) => {
         if (s.id !== id) return s;

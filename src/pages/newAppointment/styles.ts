@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     justifyContent: "center",
-    minHeight: 40, // Para garantir que o texto fique centralizado verticalmente
+    minHeight: 40,
   },
   buttonWrapper: {
     marginTop: 28,

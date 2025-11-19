@@ -51,7 +51,6 @@ export const styles = StyleSheet.create({
     fontSize: 18,
   },
 
-  // Botão de voltar
   backButton: {
     position: "absolute",
     top: 40,
@@ -59,7 +58,6 @@ export const styles = StyleSheet.create({
     padding: 8,
   },
 
-  // Lista
   listContent: {
     paddingBottom: 24,
   },

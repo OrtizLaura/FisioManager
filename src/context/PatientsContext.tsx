@@ -31,7 +31,6 @@ const PatientsContext = createContext<PatientsContextData>(
 export function PatientsProvider({ children }: { children: ReactNode }) {
   const [patients, setPatients] = useState<Patient[]>([]);
 
-  // Buscar pacientes do backend ao montar o componente
   useEffect(() => {
     fetch("http://localhost:3000/patients")
       .then((res) => res.json())
@@ -66,10 +65,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Se o status de presença estiver no backend, você pode criar uma rota para atualizar
-  // Caso contrário, pode manter localmente ou implementar conforme necessidade
   async function togglePresence(id: string) {
-    // Exemplo simples: alterna localmente
     setPatients((prev) =>
       prev.map((p) => {
         if (p.id !== id) return p;
